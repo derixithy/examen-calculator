@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Examen calculator</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.5.9/dist/css/uikit.min.css" />
+
+		<!-- UIkit JS -->
+		<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.9/dist/js/uikit.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/uikit@3.5.9/dist/js/uikit-icons.min.js"></script>
+		<style>
+			.middle {
+				position:absolute;
+				left:50%;top:50%;
+				-webkit-transform:translate(-50%,-50%);
+				-ms-transform:translate(-50%,-50%);
+				transform:translate(-50%,-50%)
+			}
+			.uk-container-supersmall {
+				max-width: 500px;
+				min-width: 420px;
+			}
+			.no-pad li { padding-top: 0; }
+		</style>
+    </head>
+    <body>
+    	<div class="uk-container uk-container-supersmall middle">
+    		<div class="uk-card uk-card-small" uk-toggle="cls: uk-card-default; mode: media; media: 520">
+
+			    <div class="uk-card-header">
+			        <h3 class="uk-card-title">
+			        	Examen calculator
+						<ul class="uk-iconnav uk-margin-small-top uk-float-right">
+						    <li>
+						    	<a uk-icon="icon: link" href="https://www.examtopics.com/exams/microsoft/" target="_blank"></a>
+						    </li>
+						    <li uk-tooltip="title:Tel het aantal haalbare en punten en fouten op, de score word automatisch bijgewerkt; delay: 500">
+						    	<a uk-icon="icon: info"></a>
+						    </li>
+						    <li uk-tooltip="title:Reset; delay: 500">
+						    	<a href="#" class="uk-link-reset uk-text-small" uk-icon="icon: trash" onclick="clearStorage();"></a>
+						    </li>
+						</ul>
+					</h3>
+			    </div>
+
+			    <div class="uk-card-body uk-margin-top uk-text-center">
+			    	<div id="score" class="uk-margin-bottom">
+					    <span id="percentage" class="uk-countdown-number"></span>
+					    <span class="uk-countdown-number">%</span>
+					</div>
+				    <div class="uk-clearfix uk-margin-small-top">
+					    <span id="info" class="uk-float-right">Info</span>
+					</div>
+			    </div>
+
+			    <div class="uk-card-footer uk-padding-small">
+			    	<div uk-grid>
+			    		<div class="uk-width-small">
+					    	<ul class="uk-iconnav uk-iconnav-vertical uk-text-center">
+							    <li><a href="#" uk-icon="icon: chevron-up" onclick="addMistake();"></a></li>
+							    <li class="uk-text-lead"><span id="mistake"></span> Fout</li>
+							    <li><a href="#" uk-icon="icon: chevron-down" onclick="removeMistake();"></a></li>
+							</ul>
+						</div>
+
+						<div class="uk-width-expand"></div>
+
+						<div class="uk-width-small">
+					    	<ul class="uk-iconnav uk-iconnav-vertical uk-text-center">
+							    <li><a href="#" uk-icon="icon: chevron-up" onclick="addPoint();"></a></li>
+							    <li class="uk-text-lead"><span id="points"></span> Punten</li>
+							    <li><a href="#" uk-icon="icon: chevron-down" onclick="removePoint();"></a></li>
+							</ul>
+						</div>
+
+					</div>
+			    </div>
+
+			</div>
+    	</div>
+
+    	<script type="text/javascript">
+    		function addPoint( amount = 1 ) {
+    			var point = parseInt(localStorage.getItem('points'));
+    			point += amount;
+
+	    		localStorage.setItem('points',
+	    			point
+	    		);
+
+	    		update();
+	    	}
+
+    		function addMistake( amount = 1 ) {
+    			var mistake = parseInt(localStorage.getItem('mistake'));
+    			mistake += amount;
+
+	    		localStorage.setItem('mistake',
+	    			mistake
+	    		);
+
+	    		update();
+	    	}
+    		function removePoint( amount = 1 ) {
+    			var point = parseInt(localStorage.getItem('points'));
+    			point -= amount;
+
+    			if ( point < 0 ) point = 0;
+
+	    		localStorage.setItem('points',
+	    			point
+	    		);
+
+	    		update();
+	    	}
+
+    		function removeMistake( amount = 1 ) {
+    			var mistake = parseInt(localStorage.getItem('mistake'));
+
+    			mistake -= amount;
+
+    			if ( mistake < 0 ) mistake = 0;
+
+	    		localStorage.setItem('mistake',
+	    			mistake
+	    		);
+
+	    		update();
+	    	}
+
+	    	function calcPercentage( partial, total ) {
+	    		return ((100 * partial) / total).toFixed(0);
+	    	}
+
+	    	function update() {
+	    		if ( localStorage.getItem('points') == null )
+	    			localStorage.setItem('points', 0)
+
+	    		if ( localStorage.getItem('mistake') == null )
+	    			localStorage.setItem('mistake', 0)
+
+	    		var points  = localStorage.getItem('points');
+	    		var mistake = localStorage.getItem('mistake');
+	    		var correct = points - mistake;
+	    		if ( correct < 0 ) correct = 0;
+
+
+	    		var percentage = calcPercentage(
+	    			correct,
+	    			points
+	    		);
+
+	    		if ( percentage == NaN || percentage < 0 || percentage > 100)
+	    			percentage = 100;
+
+	    		var elScore = document.getElementById("score");
+	    		var elInfo = document.getElementById("info");
+	    		var elPercentage = document.getElementById("percentage");
+	    		var elMistake = document.getElementById("mistake");
+	    		var elPoints = document.getElementById("points");
+
+
+	    		elMistake.innerHTML = mistake;
+	    		elPoints.innerHTML = points;
+
+	    		elPercentage.innerHTML = percentage;
+
+	    		if (elPercentage.innerHTML == 'NaN' )
+	    			elPercentage.innerHTML = 100;
+
+	    		if ( elPercentage.innerHTML >= 95 ) {
+	    			elScore.classList.add('uk-text-success');
+	    			elScore.classList.remove('uk-text-primary');
+	    			elScore.classList.remove('uk-text-danger');
+	    			elScore.classList.remove('uk-text-warning');
+	    		}
+
+	    		else if ( elPercentage.innerHTML >= 85 ) {
+	    			elScore.classList.add('uk-text-primary');
+	    			elScore.classList.remove('uk-text-danger');
+	    			elScore.classList.remove('uk-text-success');
+	    			elScore.classList.remove('uk-text-warning');
+	    		}
+
+	    		else if ( elPercentage.innerHTML > 75 ) {
+	    			elScore.classList.remove('uk-text-primary');
+	    			elScore.classList.remove('uk-text-danger');
+	    			elScore.classList.remove('uk-text-success');
+	    			elScore.classList.remove('uk-text-warning');
+	    		}
+
+	    		else if ( elPercentage.innerHTML > 70 ){
+	    			elScore.classList.remove('uk-text-danger');
+	    			elScore.classList.remove('uk-text-primary');
+	    			elScore.classList.remove('uk-text-success');
+	    			elScore.classList.add('uk-text-warning');
+	    		}
+
+	    		else{
+	    			elScore.classList.remove('uk-text-primary');
+	    			elScore.classList.add('uk-text-danger');
+	    			elScore.classList.remove('uk-text-success');
+	    			elScore.classList.remove('uk-text-warning');
+	    		}
+
+	    		elInfo.innerHTML = correct + " van de " + points + " punten gehaald";
+	    	}
+
+	    	function clearStorage() {
+	    		localStorage.clear();
+	    		console.log('cleared');
+	    		update();
+	    	}
+
+	    	update();
+    	</script>
+    </body>
+</html>
+
